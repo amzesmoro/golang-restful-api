@@ -1,31 +1,35 @@
 package main
 
 import (
-	"github.com/go-playground/validator/v10"
 	_ "github.com/lib/pq"
-	"golang-restful-api/app"
-	"golang-restful-api/controller"
 	"golang-restful-api/helper"
 	"golang-restful-api/middleware"
-	"golang-restful-api/repository"
-	"golang-restful-api/service"
 	"net/http"
 )
 
+func NewServer(authMiddleware *middleware.AuthMiddleware) *http.Server {
+	return &http.Server{
+		Addr:    "localhost:3000",
+		Handler: authMiddleware,
+	}
+}
+
 func main() {
 
-	db := app.NewDB()
-	validate := validator.New()
-	categoryRepository := repository.NewCategoryRepository()
-	categoryService := service.NewCategoryService(categoryRepository, db, validate)
-	categoryController := controller.NewCategoryController(categoryService)
+	/*
+		Without DI
+		db := app.NewDB()
+		validate := validator.New()
+		categoryRepository := repository.NewCategoryRepository()
+		categoryService := service.NewCategoryService(categoryRepository, db, validate)
+		categoryController := controller.NewCategoryController(categoryService)
+		router := app.NewRouter(categoryController)
+		authMiddleware := middleware.NewAuthMiddleware(router)
+		server := NewServer(authMiddleware)
+	*/
 
-	router := app.NewRouter(categoryController)
-
-	server := http.Server{
-		Addr:    "localhost:3000",
-		Handler: middleware.NewAuthMiddleware(router),
-	}
+	// with DI
+	server := InitializedServer()
 
 	err := server.ListenAndServe()
 	helper.PanicIfError(err)
