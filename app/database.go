@@ -7,7 +7,7 @@ import (
 )
 
 func NewDB() *sql.DB {
-	connStr := "postgres://postgres:@localhost:5432/golang_restful_api?sslmode=disable"
+	connStr := "postgres://postgres:@localhost:5432/golang_restful_api_migration?sslmode=disable"
 	db, err := sql.Open("postgres", connStr)
 	helper.PanicIfError(err)
 
